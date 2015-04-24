@@ -1,0 +1,140 @@
+\documentclass{article}  
+
+\usepackage{amsmath}
+\title{SQL and Relational Algebra}
+\author{Introduction to Data Science - University of Washington}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Union}
+
+Does not include duplicates:
+
+\begin{verbatim}
+SELECT * FROM R1
+UNION
+SELECT * FROM R2
+\end{verbatim}
+
+Includes duplicates:
+
+\begin{verbatim}
+SELECT * FROM R1
+UNION ALL
+SELECT * FROM R2
+\end{verbatim}
+
+\section{Difference}
+
+Removes rows in R1 that also exist in R2. 
+
+\begin{verbatim}
+SELECT * FROM R1
+EXCEPT
+SELECT * FROM R2
+\end{verbatim}
+
+Note - Intersection can be found using Union and Difference, or using Join. 
+
+\section{Selection}
+
+Returns all tuples which satisfy a certain condition. This can involve any sort of function that returns a boolean value. 
+
+\begin{verbatim}
+SELECT * FROM R1
+WHERE salary > 40000 AND Name = "Smith"
+\end{verbatim}
+
+\section{Project}
+
+Eliminates columns. Note that duplicates will remain unless you explicitly get rid of them. 
+
+\begin{verbatim}
+SELECT name, lastname FROM R1
+\end{verbatim}
+
+\subsection{Join}
+
+Here are two ways to join two tables that share a certain ID variable (equi-join):
+
+\begin{verbatim}
+SELECT * FROM R1, R2
+WHERE R1.A = R2.B
+\end{verbatim}
+
+\begin{verbatim}
+SELECT * FROM R1 JOIN R2
+ON R1.A = R2.B
+\end{verbatim}
+
+In practice, the queries are equivalent because the program will optimize the relational algebra anyway. 
+
+A theta-join is a join with a condition. Assume that we've written a distance function that takes two locations.
+
+\begin{verbatim}
+SELECT DISTINCT h.name
+FROM Hospitals h, Schools s
+WHERE distance(h.location, s.location) < 5
+\end{verbatim}
+
+Left outer join takes all of the tuples from R1, takes R2 if it matches but is set to NULL otherwise. Right outer join is the opposite. Full outer join takes all tuples, pads out the missing values wtih NULLs.
+
+\begin{verbatim}
+SELECT * FROM R1 OUTER JOIN R2
+ON R1.A = R2.B
+\end{verbatim}
+
+\section{Nesting}
+
+We can select from another query:
+
+\begin{verbatim}
+FROM (
+SELECT * FROM R1
+) x 
+\end{verbatim}
+
+If we want to add in a constant variable column, we can include this in our select statement:
+
+\begin{verbatim}
+SELECT 5.0 as binsize
+\end{verbatim}
+
+We can also use aggregated functions such as \emph{avg}() with the GROUP BY clause. 
+
+\begin{verbatim}
+SELECT binid, avg(height) as height FROM R1
+GROUP BY binid
+ORDER BY binid asc
+\end{verbatim}
+
+\section{Case}
+
+\begin{verbatim}
+CASE WHEN (x.day > 2)
+	THEN ...
+WHEN (...)
+	THEN ...
+END AS myFunction
+\end{verbatim}
+
+\section{User defined functions}
+
+\begin{itemize}
+\item Scalar functions - Can appear anywhere.
+\item Aggregate functions - In SELECT clause, requires a GROUP BY clause.
+\item Table functions - Comes after FROM.
+\end{itemize}
+
+Note that Microsoft SQL Server has support for user-defined functions written in SQL, but SQLite does not! PostgreSQL and Greenplum have support for Python and R functions.
+
+\section{Physical optimization}
+
+We can use the keyword EXPLAIN to understand what is going on behind the scenes. Generally we don't need to worry about optimization because the database program will do this for us.
+
+
+
+\end{document}
